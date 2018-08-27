@@ -1,6 +1,7 @@
 package com.starylwu.mybatis.session;
 
 import java.lang.reflect.Proxy;
+import java.sql.Connection;
 
 /**
  * @Auther: Wuyulong
@@ -13,10 +14,12 @@ public class SqlSession {
 
     // TODO configuration
 
+    private PoolConnection poolConnection = new PoolConnection();
+
     public <T> T selectOne(String statement, Object parameter){
 
         // use executor select
-        return executor.query(statement, parameter);
+        return executor.query(statement, parameter, this);
     }
 
     public <T> T getMapper(Class<T> clazz){
@@ -26,4 +29,15 @@ public class SqlSession {
                 new Class[]{clazz},
                 new SqlSessionInterceptor(this, clazz));
     }
+
+    public Connection openConnection(){
+        try {
+            return poolConnection.getConnection();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 }

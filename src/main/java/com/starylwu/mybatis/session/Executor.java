@@ -7,5 +7,5 @@ package com.starylwu.mybatis.session;
  */
 public interface Executor {
 
-    <E> E query(String sql, Object parameter);
+    <E> E query(String sql, Object parameter, SqlSession session);
 }

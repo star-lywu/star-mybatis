@@ -6,6 +6,7 @@ import org.apache.ibatis.reflection.invoker.Invoker;
 import org.apache.ibatis.reflection.invoker.MethodInvoker;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -25,8 +26,6 @@ public class Reflector {
     public final Map<String, Class<?>> setTypes = new HashMap<String, Class<?>>();
     public final Map<String, Class<?>> getTypes = new HashMap<String, Class<?>>();
 
-    private static final String setMethodFix = "set";
-    private static final String getMethodFix = "get";
 
     /**
      * 构造的时候初始化对应class的get/set方法
@@ -36,32 +35,14 @@ public class Reflector {
         Set<String> fieldSet = fieldMapping.keySet();
         fieldSet.stream().forEach(fieldName -> {
             try {
-                String setMethodName = setMethodFix + toUpFirst(fieldName);
-                String getMethodName = getMethodFix + toUpFirst(fieldName);
-                Method[] methods = cls.getMethods();
-                for (int j=0; j< methods.length; j++){
-                    Method method = methods[j];
-                    if (Objects.equals(setMethodName,method.getName())){
-                        setMethods.put(fieldName, method);
-                    }
-                    if (Objects.equals(getMethodName,method.getName())){
-                        getMethods.put(fieldName, method);
-                    }
-                }
+                PropertyDescriptor descriptor = new PropertyDescriptor(fieldName, cls);
+                Method setMethod = descriptor.getWriteMethod();
+                Method getMethod = descriptor.getReadMethod();
+                setMethods.put(fieldName, setMethod);
+                getMethods.put(fieldName, getMethod);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-    }
-
-    /**
-     * 将首字母大写
-     * @param value
-     * @return
-     */
-    private String toUpFirst(String value){
-        char[] chars = value.toCharArray();
-        chars[0] -= 32;
-        return String.valueOf(chars);
     }
 }
