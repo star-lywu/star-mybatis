@@ -1,8 +1,11 @@
 package com.starylwu.mybatis.session;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * @Author: WuYuLong
@@ -10,14 +13,29 @@ import java.sql.SQLException;
  * @DESC:
  */
 public class PoolConnection {
+    private static String URL;
+    private static String USER;
+    private static String PASSWORD;
+    private static String CLASSDRIVER;
+
+    static {
+        InputStream resource = Thread.currentThread().getClass().getResourceAsStream(ClassLoader.getSystemResource("") + "jdbc.properties");
+        Properties properties = new Properties();
+        try {
+            properties.load(resource);
+            URL = properties.getProperty("url");
+            USER = properties.getProperty("username");
+            PASSWORD = properties.getProperty("password");
+            CLASSDRIVER = properties.getProperty("driver");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public Connection getConnection()throws Exception{
-        String URL="jdbc:mysql://127.0.0.1:3306/star-mybatis?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-        String USER="root";
-        String PASSWORD="root";
         //1.加载驱动程序
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName(CLASSDRIVER);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
