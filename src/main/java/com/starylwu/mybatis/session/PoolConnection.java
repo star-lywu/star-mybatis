@@ -1,8 +1,8 @@
 package com.starylwu.mybatis.session;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
@@ -19,9 +19,13 @@ public class PoolConnection {
     private static String CLASSDRIVER;
 
     static {
-        InputStream resource = Thread.currentThread().getClass().getResourceAsStream(ClassLoader.getSystemResource("") + "jdbc.properties");
+        String fileName = "/jdbc.properties";
+        InputStream resource = Thread.currentThread().getClass().getResourceAsStream(fileName);
         Properties properties = new Properties();
         try {
+            if (resource == null){
+                throw new FileNotFoundException(fileName + " file is not found");
+            }
             properties.load(resource);
             URL = properties.getProperty("url");
             USER = properties.getProperty("username");
